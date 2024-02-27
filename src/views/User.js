@@ -46,12 +46,12 @@ function UserForm() {
     const [submitLabel, setSubmitLabel] = React.useState('Register User')
     const [searchText, setSearch] = React.useState('')
     const [titleList] = React.useState([
-        { value: 1, label: 'Mr.' },
-        { value: 2, label: 'Mrs.' },
-        { value: 3, label: 'Miss.' },
-        { value: 4, label: 'Ms.' },
-        { value: 5, label: 'Dr.' },
-        { value: 6, label: 'Prof.' },
+        { value: "1", label: 'Mr.' },
+        { value: "2", label: 'Mrs.' },
+        { value: "3", label: 'Miss.' },
+        { value: "4", label: 'Ms.' },
+        { value: "5", label: 'Dr.' },
+        { value: "6", label: 'Prof.' },
     ])
 
     const [userRoleList] = React.useState([
@@ -70,7 +70,7 @@ function UserForm() {
     ])
 
     const [visibleSearch, setvisibleSearch] = useState(false)
-    let rowId = 0;
+
     const initialUserData = {
         id: '',
         title: '',
@@ -127,15 +127,26 @@ function UserForm() {
         e.preventDefault();
         setLoading(true)
         try {
-            const response = await axios.post(contextUrl, formData, {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true,
-            })
+            if (editMode) {
+                const response = await axios.put(contextUrl + `/${formData.id}`, formData, {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true,
+                })
+                swal("Success", "User Updated Successfully !", "success");
+            } else {
+
+                const response = await axios.post(contextUrl, formData, {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true,
+                })
+                swal("Success", "User Registered Successfully !", "success");
+            }
             clear();
-            swal("Success", "User Registered Successfully !", "success");
+
+
         } catch (error) {
             // console.error('An error occurred:', error.response.data.error);
-            swal("Problem", error.response.data.error, "error");
+            swal("Problem", error.response ? error.response.data.error : 'Problem with Data Submission', "error");
         }
         setLoading(false)
     };
@@ -157,7 +168,10 @@ function UserForm() {
             setLoading(true)
             try {
                 if (row.id) {
-                    const response = null;
+                    const response = await axios.get(
+                        contextUrl + `/${row.id}`
+                    );
+
                     if (response.data) {
                         setFormValues(response.data)
                         setEditMode(true)
@@ -175,38 +189,64 @@ function UserForm() {
         [currentPage, perPage, totalRows]
     );
 
+    const handleDelete = useCallback(
+        row => async () => {
+            swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then(async (willDelete) => {
+                    if (willDelete) {
+                        try {
+                            const respo = await axios.delete(contextUrl + `/${row.id}`)
+                            if (respo.data.status === false) {
+                                swal("Error", respo.data.message, "error");
+                            } else {
+                                const newData = data.filter(a => a.id !== row.id)
+                                setData(newData)
+                                setTotalRows(newData.length)
+                                swal("Success", "User Removed Successfully !", "success");
+                                clear()
+                            }
+                        } catch (error) {
+                            swal("Error", error.response.data.message, "error");
+                        }
+                    }
+                });
+        }, [currentPage, perPage, totalRows]
+
+    );
+
     const columns = useMemo(
         () => [
             {
-                name: 'Username',
-                selector: row => row.Username,
-                sortable: false,
-            },
-            {
-                name: "First Name",
-                selector: row => row.FirstName,
+                name: 'First Name',
+                selector: row => row.firstName,
                 sortable: false,
             },
             {
                 name: "Last Name",
-                selector: row => row.LastName,
+                selector: row => row.lastName,
                 sortable: false,
             },
             {
-                name: "Email",
-                selector: row => row.EmailAddress,
+                name: "Username",
+                selector: row => row.username,
                 sortable: false,
             },
             {
-                name: "User Type",
-                selector: row => row.UserType,
+                name: "Designation",
+                selector: row => row.designation,
                 sortable: false,
             },
             {
                 name: "Action",
-                width: "75px",
+                width: "120px",
                 sortable: false,
-                cell: row => <div><button data-testid={rowId++} title='Edit User' style={{ color: 'white' }} className='btn btn-warning small' onClick={handleEdit(row)}><CIcon icon={cilPencil} /></button></div>
+                cell: row => <div><button title='Update User' className='btn btn-warning small' onClick={handleEdit(row)}><CIcon icon={cilPencil} /></button> <button title='Remove User' className='btn btn-danger small ' onClick={handleDelete(row)}><CIcon icon={cilTrash} style={{ color: 'white' }} /></button></div>
             },
         ],
         [handleEdit]
@@ -218,7 +258,7 @@ function UserForm() {
     };
 
     const filterHandler = async () => {
-        // await fetcUsers(1, searchText)
+        await fetcUsers()
     }
     const handlePerRowsChange = async (newPerPage, page) => {
         setPerPage(newPerPage);
@@ -228,8 +268,31 @@ function UserForm() {
     const openSearchModal = async () => {
         setSearch('')
         setvisibleSearch(!visibleSearch)
-        // fetcUsers(1, '')
+        fetcUsers()
     }
+
+    const fetcUsers = async () => {
+
+        setLoading(true);
+        let total = 0;
+        let dataset = [];
+        try {
+            const headers = {
+                'name': searchText
+            };
+            const response = await axios.get(contextUrl, { headers });
+            dataset = response.data
+            total = response.data.length
+        } catch (error) {
+            total = 0;
+            dataset = [];
+        }
+        setData(dataset);
+        setTotalRows(total);
+        setLoading(false);
+
+
+    };
 
     const filterLitsner = async (event) => {
         if (event.key === 'Enter') {
@@ -353,9 +416,6 @@ function UserForm() {
                                             <CFormInput
                                                 placeholder=" Search "
                                                 id="search"
-                                                onKeyDown={event => {
-                                                    filterLitsner(event);
-                                                }}
                                                 onChange={event => {
                                                     setSearch(event.target.value);
                                                 }}
@@ -372,7 +432,6 @@ function UserForm() {
                                         data={data}
                                         progressPending={loading}
                                         pagination
-                                        paginationServer
                                         paginationTotalRows={totalRows}
                                         paginationDefaultPage={currentPage}
                                         onChangeRowsPerPage={handlePerRowsChange}
