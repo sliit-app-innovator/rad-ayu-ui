@@ -1,0 +1,10 @@
+.cd {
+    width: 257px;
+    display: flex;
+}
+
+.md {
+    width: 250px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}

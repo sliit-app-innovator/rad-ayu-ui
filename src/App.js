@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, Suspense } from 'react'
+import { HashRouter, Route, Routes } from 'react-router-dom'
+import TimeAgo from 'javascript-time-ago'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import en from 'javascript-time-ago/locale/en.json'
+import ru from 'javascript-time-ago/locale/ru.json'
+// import './App.css';
+import './scss/style.scss'
+
+TimeAgo.addDefaultLocale(en)
+TimeAgo.addLocale(ru)
+
+const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
+// const Login = React.lazy(() => import('./views/login/Login'))
+
+const loading = (
+  <div className="pt-3 text-center">
+    <div className="sk-spinner sk-spinner-pulse"></div>
+  </div>
+)
+
+class App extends Component {
+  render() {
+    return (
+      <HashRouter>
+        <Suspense fallback={loading}>
+          <Routes>
+            {/* <Route exact path="/login" name="Login Page" element={<Login />} /> */}
+            <Route>
+              <Route path="*" name="Home" element={<DefaultLayout />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </HashRouter>
+    );
+  }
 }
 
 export default App;
