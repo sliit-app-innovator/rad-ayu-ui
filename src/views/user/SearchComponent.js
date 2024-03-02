@@ -6,11 +6,11 @@ import DataTable from "react-data-table-component";
 import { cilSearch } from '@coreui/icons';
 import CIcon from '@coreui/icons-react'
 
-function SearchModal({ visible, onClose, searchText, setSearchText, columns, data, loading, filterHandler }) {
+function SearchModal({ visible, onClose, searchText, setSearchText, columns, data, loading, filterHandler, heading }) {
     return (
-        <CModal size="xl" visible={visible} onClose={onClose} aria-labelledby="userSearch">
+        <CModal size="xl" visible={visible} onClose={onClose} aria-labelledby="searchDetails">
             <CModalHeader>
-                <CModalTitle id="userSearch">Search User</CModalTitle>
+                <CModalTitle id="searchDetails">{heading}</CModalTitle>
             </CModalHeader>
             <CModalBody>
                 <CRow>

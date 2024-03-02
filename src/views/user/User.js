@@ -377,6 +377,7 @@ function UserForm() {
                             columns={columns}
                             data={data}
                             loading={loading}
+                            heading={'Search User'}
                             filterHandler={filterHandler}
                         />
                     </CCardBody>
