@@ -9,23 +9,14 @@ import {
     CForm,
     CFormInput,
     CFormLabel,
-    CFormTextarea,
     CRow,
     CSpinner,
-    CFormCheck,
-    CModal,
-    CModalHeader,
-    CModalTitle,
-    CModalBody,
-    CInputGroup,
-    CInputGroupText
 } from '@coreui/react'
-import DataTable from "react-data-table-component";
 import Select from 'react-select'
-import axios from '../config/axios'
+import axios from '../../config/axios'
 import swal from 'sweetalert';
 import CIcon from '@coreui/icons-react'
-// import '../../pages/pages.css';
+import SearchModal from './SearchComponent';
 
 import {
     cilTrash,
@@ -39,12 +30,10 @@ function UserForm() {
     const [loading, setLoading] = React.useState(false)
     const [validated, setValidated] = React.useState(false)
     const [data, setData] = useState([]);
-    const [totalRows, setTotalRows] = useState(0);
-    const [perPage, setPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
     const [editMode, setEditMode] = React.useState(false)
     const [submitLabel, setSubmitLabel] = React.useState('Register User')
     const [searchText, setSearch] = React.useState('')
+    const [visibleSearch, setvisibleSearch] = React.useState(false)
     const [titleList] = React.useState([
         { value: "1", label: 'Mr.' },
         { value: "2", label: 'Mrs.' },
@@ -69,7 +58,15 @@ function UserForm() {
         { value: 3, label: 'Helth' },
     ])
 
-    const [visibleSearch, setvisibleSearch] = useState(false)
+    const visibleSearchFunction = (status) => {
+        setvisibleSearch(status)
+    };
+
+    const searchTextFunction = (search) => {
+        setSearch(search)
+    };
+
+
 
     const initialUserData = {
         id: '',
@@ -113,15 +110,12 @@ function UserForm() {
         });
     };
 
-
     const clear = async () => {
         setFormData(initialUserData);
         setSubmitLabel('Register User')
         setValidated(false)
         setEditMode(false)
-        setCurrentPage(1);
     }
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -143,12 +137,13 @@ function UserForm() {
             }
             clear();
 
-
         } catch (error) {
             // console.error('An error occurred:', error.response.data.error);
             swal("Problem", error.response ? error.response.data.error : 'Problem with Data Submission', "error");
         }
-        setLoading(false)
+        finally {
+            setLoading(false);
+        }
     };
 
     const setFormValues = (values) => {
@@ -158,10 +153,6 @@ function UserForm() {
         });
     };
 
-
-    useEffect(() => {
-        // fetcUsers(1)
-    }, [])
 
     const handleEdit = useCallback(
         row => async () => {
@@ -186,7 +177,6 @@ function UserForm() {
                 setLoading(false)
             }
         },
-        [currentPage, perPage, totalRows]
     );
 
     const handleDelete = useCallback(
@@ -207,7 +197,6 @@ function UserForm() {
                             } else {
                                 const newData = data.filter(a => a.id !== row.id)
                                 setData(newData)
-                                setTotalRows(newData.length)
                                 swal("Success", "User Removed Successfully !", "success");
                                 clear()
                             }
@@ -216,7 +205,7 @@ function UserForm() {
                         }
                     }
                 });
-        }, [currentPage, perPage, totalRows]
+        },
 
     );
 
@@ -252,18 +241,9 @@ function UserForm() {
         [handleEdit]
     );
 
-    const handlePageChange = async (page) => {
-        setCurrentPage(page);
-        // await fetcUsers(page);
-    };
-
     const filterHandler = async () => {
         await fetcUsers()
     }
-    const handlePerRowsChange = async (newPerPage, page) => {
-        setPerPage(newPerPage);
-        // await fetcUsers(page, searchText, newPerPage);
-    };
 
     const openSearchModal = async () => {
         setSearch('')
@@ -272,9 +252,7 @@ function UserForm() {
     }
 
     const fetcUsers = async () => {
-
         setLoading(true);
-        let total = 0;
         let dataset = [];
         try {
             const headers = {
@@ -282,23 +260,14 @@ function UserForm() {
             };
             const response = await axios.get(contextUrl, { headers });
             dataset = response.data
-            total = response.data.length
         } catch (error) {
-            total = 0;
             dataset = [];
         }
         setData(dataset);
-        setTotalRows(total);
         setLoading(false);
-
-
     };
 
-    const filterLitsner = async (event) => {
-        if (event.key === 'Enter') {
-            filterHandler()
-        }
-    }
+
 
     return (
         <CRow>
@@ -399,47 +368,17 @@ function UserForm() {
                             </CRow>
                         </CForm>
                         <p></p>
-                        <CModal
-                            size="xl"
-                            visible={visibleSearch}
-                            onClose={() => setvisibleSearch(false)}
-                            aria-labelledby="userSearch">
-                            <CModalHeader>
-                                <CModalTitle id="userSearch">Search User</CModalTitle>
-                            </CModalHeader>
-                            <CModalBody>
-                                <CRow>
-                                    <CCol xs={6} ></CCol>
-                                    <CCol xs={6} >
-                                        <CInputGroup className="mb-3">
 
-                                            <CFormInput
-                                                placeholder=" Search "
-                                                id="search"
-                                                onChange={event => {
-                                                    setSearch(event.target.value);
-                                                }}
-                                            />
-                                            <CInputGroupText className='search-btn' onClick={(e) => filterHandler()} >
-                                                <CIcon icon={cilSearch} />
-                                            </CInputGroupText>
-                                        </CInputGroup>
-                                    </CCol>
-                                </CRow>
-                                <CRow>
-                                    <DataTable
-                                        columns={columns}
-                                        data={data}
-                                        progressPending={loading}
-                                        pagination
-                                        paginationTotalRows={totalRows}
-                                        paginationDefaultPage={currentPage}
-                                        onChangeRowsPerPage={handlePerRowsChange}
-                                        onChangePage={handlePageChange}
-                                    />
-                                </CRow>
-                            </CModalBody>
-                        </CModal>
+                        <SearchModal
+                            visible={visibleSearch}
+                            onClose={() => visibleSearchFunction(false)}
+                            searchText={searchText}
+                            setSearchText={searchTextFunction}
+                            columns={columns}
+                            data={data}
+                            loading={loading}
+                            filterHandler={filterHandler}
+                        />
                     </CCardBody>
                 </CCard>
             </CCol>

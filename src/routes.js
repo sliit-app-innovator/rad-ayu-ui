@@ -1,6 +1,6 @@
 import React from 'react'
 
-const User = React.lazy(() => import('./views/User'))
+const User = React.lazy(() => import('./views/user/User'))
 
 const routes = [
     { path: '/', exact: true, name: 'Home' },
