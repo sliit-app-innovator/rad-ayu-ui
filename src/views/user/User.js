@@ -13,10 +13,10 @@ import {
     CSpinner,
 } from '@coreui/react'
 import Select from 'react-select'
-import axios from '../../config/axios'
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import swal from 'sweetalert';
 import CIcon from '@coreui/icons-react'
-import SearchModal from './SearchComponent';
+import SearchModal from '../common/SearchComponent';
 
 import {
     cilTrash,
@@ -27,6 +27,7 @@ const contextUrl = '/user'
 
 function UserForm() {
 
+    const axiosPrivate = useAxiosPrivate();
     const [loading, setLoading] = React.useState(false)
     const [validated, setValidated] = React.useState(false)
     const [data, setData] = useState([]);
@@ -65,8 +66,6 @@ function UserForm() {
     const searchTextFunction = (search) => {
         setSearch(search)
     };
-
-
 
     const initialUserData = {
         id: '',
@@ -122,14 +121,14 @@ function UserForm() {
         setLoading(true)
         try {
             if (editMode) {
-                const response = await axios.put(contextUrl + `/${formData.id}`, formData, {
+                const response = await axiosPrivate.put(contextUrl + `/${formData.id}`, formData, {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true,
                 })
                 swal("Success", "User Updated Successfully !", "success");
             } else {
 
-                const response = await axios.post(contextUrl, formData, {
+                const response = await axiosPrivate.post(contextUrl, formData, {
                     headers: { 'Content-Type': 'application/json' },
                     withCredentials: true,
                 })
@@ -159,7 +158,7 @@ function UserForm() {
             setLoading(true)
             try {
                 if (row.id) {
-                    const response = await axios.get(
+                    const response = await axiosPrivate.get(
                         contextUrl + `/${row.id}`
                     );
 
@@ -191,7 +190,7 @@ function UserForm() {
                 .then(async (willDelete) => {
                     if (willDelete) {
                         try {
-                            const respo = await axios.delete(contextUrl + `/${row.id}`)
+                            const respo = await axiosPrivate.delete(contextUrl + `/${row.id}`)
                             if (respo.data.status === false) {
                                 swal("Error", respo.data.message, "error");
                             } else {
@@ -258,7 +257,7 @@ function UserForm() {
             const headers = {
                 'name': searchText
             };
-            const response = await axios.get(contextUrl, { headers });
+            const response = await axiosPrivate.get(contextUrl, { headers });
             dataset = response.data
         } catch (error) {
             dataset = [];

@@ -11,7 +11,7 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
-// const Login = React.lazy(() => import('./views/login/Login'))
+const Login = React.lazy(() => import('./views/Login'))
 
 const loading = (
   <div className="pt-3 text-center">
@@ -25,7 +25,7 @@ class App extends Component {
       <HashRouter>
         <Suspense fallback={loading}>
           <Routes>
-            {/* <Route exact path="/login" name="Login Page" element={<Login />} /> */}
+            <Route exact path="/login" name="Login Page" element={<Login />} />
             <Route>
               <Route path="*" name="Home" element={<DefaultLayout />} />
             </Route>

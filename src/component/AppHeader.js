@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
+
 import {
     CContainer,
     CHeader,
@@ -16,9 +17,7 @@ import './header.css'
 
 const AppHeader = () => {
 
-    useEffect(() => {
 
-    }, []);
 
 
 
