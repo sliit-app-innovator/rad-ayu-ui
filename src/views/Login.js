@@ -103,7 +103,7 @@ const Login = () => {
                                 <CCardBody>
                                     <CForm onSubmit={handleSubmit}>
                                         <h1>Login</h1>
-                                        <p className="t1">Sign In to OTP Conversion Dashboard</p>
+                                        <p className="t1">Sign In to AYU</p>
                                         <div>
                                             {errMsg ? (
                                                 <CAlert color="danger" data-testid="login-error">
