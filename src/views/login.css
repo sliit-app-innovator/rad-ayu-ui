@@ -1,0 +1,51 @@
+body,
+html {
+    height: 100%;
+    background-color: #f4f7f6;
+    /* Soft background color */
+}
+
+.card {
+    border: none;
+    /* Removes the default card border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Adds a subtle shadow for depth */
+}
+
+.card-body {
+    padding: 2rem;
+    /* Increased padding for a spacious layout */
+}
+
+.form-control:focus {
+    border-color: #5cb85c;
+    /* Highlight color for input fields on focus */
+    box-shadow: 0 0 0 0.2rem rgba(92, 184, 92, 0.25);
+    /* Subtle shadow on focus */
+}
+
+.btn-primary {
+    background-color: #5cb85c;
+    /* Primary button color */
+    border-color: #4cae4c;
+    /* Border color slightly darker than the button for depth */
+}
+
+.btn-primary:hover {
+    background-color: #4cae4c;
+    /* Darker shade on hover for interaction feedback */
+}
+
+.text-muted {
+    color: #6c757d;
+    /* Soft color for text */
+}
+
+.input-group-text {
+    background-color: #e9ecef;
+    /* Light background for input group text */
+    border: none;
+    /* Removes default border */
+    color: #495057;
+    /* Slightly darker color for icons */
+}
