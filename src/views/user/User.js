@@ -240,6 +240,12 @@ function UserForm() {
         [handleEdit]
     );
 
+    const searchToEnter = (e) => {
+        if (e.key === 'Enter') {
+            fetcUsers()
+        }
+    }
+
     const filterHandler = async () => {
         await fetcUsers()
     }
@@ -359,7 +365,7 @@ function UserForm() {
                                     {loading ? (
                                         <CSpinner color="primary" variant="grow" />
                                     ) : (
-                                        <CButton color="danger form-control" className='customcolorDanger' type="reset" onClick={clear} >
+                                        <CButton color="danger form-control" className='customcolorDanger' style={{ color: 'white' }} type="reset" onClick={clear} >
                                             Reset
                                         </CButton>
                                     )}
@@ -378,6 +384,7 @@ function UserForm() {
                             loading={loading}
                             heading={'Search User'}
                             filterHandler={filterHandler}
+                            searchToEnter={searchToEnter}
                         />
                     </CCardBody>
                 </CCard>
