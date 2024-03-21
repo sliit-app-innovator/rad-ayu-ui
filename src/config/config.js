@@ -1,5 +1,5 @@
 const config = {
-    baseUrl: 'http://localhost:8081/ayu/service/v1/',
+    baseUrl: 'http://localhost:8080/ayu/service/v1/',
 }
 
 export default config;

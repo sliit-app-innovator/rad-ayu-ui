@@ -95,129 +95,129 @@ const Login = () => {
 
 
     return (
-        // <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
-        //     <CContainer className="tr">
-        //         <CRow className="justify-content-center">
-        //             <CCol md={6}>
-        //                 <CCardGroup className="tr1">
-        //                     <CCard className="p-4">
-        //                         <CCardBody>
-        //                             <CForm onSubmit={handleSubmit}>
-        //                                 <h1>Login</h1>
-        //                                 <p className="t1">Sign In to AYU</p>
-        //                                 <div>
-        //                                     {errMsg ? (
-        //                                         <CAlert color="danger" data-testid="login-error">
-        //                                             {errMsg}
-        //                                         </CAlert>
-        //                                     ) : (
-        //                                         ''
-        //                                     )}
-        //                                 </div>
-        //                                 <CInputGroup className="mb-3">
-        //                                     <CInputGroupText>
-        //                                         <CIcon icon={cilUser} />
-        //                                     </CInputGroupText>
-        //                                     <CFormInput
-        //                                         placeholder="Username"
-        //                                         name="username"
-        //                                         autoComplete="off"
-        //                                         value={formData.username} onChange={handleChange}
-        //                                         required={true}
-        //                                     />
-        //                                 </CInputGroup>
-        //                                 <CInputGroup className="mb-4">
-        //                                     <CInputGroupText>
-        //                                         <CIcon icon={cilLockLocked} />
-        //                                     </CInputGroupText>
-        //                                     <CFormInput
-        //                                         type="password"
-        //                                         placeholder="Password"
-        //                                         name="password"
-        //                                         value={formData.password} onChange={handleChange}
-        //                                         required={true}
-        //                                     />
-        //                                 </CInputGroup>
-        //                                 <div>
-        //                                     {loading ? (
-        //                                         ''
-        //                                     ) : (
-        //                                         <CRow>
-        //                                             <CCol xs={6}>
-        //                                                 <CButton type="submit" data-testid="login-button" className="px-4 customcolorPrimary">
-        //                                                     Log in
-        //                                                 </CButton>
-        //                                             </CCol>
-        //                                         </CRow>
-        //                                     )}
-        //                                 </div>
-        //                             </CForm>
-        //                         </CCardBody>
-        //                     </CCard>
-        //                 </CCardGroup>
-        //             </CCol>
-        //         </CRow>
-        //     </CContainer>
-        // </div>
-        <div className="bg-white min-vh-100 d-flex flex-row align-items-center">
-            <div className="container">
-                <div className="row justify-content-center">
-                    <div className="col-md-6">
-                        <div className="card-group mb-0">
-                            <div className="card p-4">
-                                <div className="card-body">
-                                    <form onSubmit={handleSubmit}>
-                                        <h1 className="text-center mb-4">Login</h1>
-                                        <p className="text-muted text-center">Sign in to your account</p>
-                                        {errMsg && (
-                                            <div className="alert alert-danger" role="alert">
-                                                {errMsg}
-                                            </div>
-                                        )}
-                                        <div className="mb-3">
-                                            <div className="input-group">
-                                                <span className="input-group-text" id="username-addon">
-                                                    <i className="cil-user"></i>
-                                                </span>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Username"
-                                                    name="username"
-                                                    autoComplete="off"
-                                                    value={formData.username}
-                                                    onChange={handleChange}
-                                                    required
-                                                />
-                                            </div>
+        <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
+            <CContainer className="tr">
+                <CRow className="justify-content-center">
+                    <CCol md={6}>
+                        <CCardGroup className="tr1">
+                            <CCard className="p-4">
+                                <CCardBody>
+                                    <CForm onSubmit={handleSubmit}>
+                                        <h1>Login</h1>
+                                        <p className="t1">Sign In to AYU</p>
+                                        <div>
+                                            {errMsg ? (
+                                                <CAlert color="danger" data-testid="login-error">
+                                                    {errMsg}
+                                                </CAlert>
+                                            ) : (
+                                                ''
+                                            )}
                                         </div>
-                                        <div className="mb-4">
-                                            <div className="input-group">
-                                                <span className="input-group-text" id="password-addon">
-                                                    <i className="cil-lock-locked"></i>
-                                                </span>
-                                                <input
-                                                    type="password"
-                                                    className="form-control"
-                                                    placeholder="Password"
-                                                    name="password"
-                                                    value={formData.password}
-                                                    onChange={handleChange}
-                                                    required
-                                                />
-                                            </div>
+                                        <CInputGroup className="mb-3">
+                                            <CInputGroupText>
+                                                <CIcon icon={cilUser} />
+                                            </CInputGroupText>
+                                            <CFormInput
+                                                placeholder="Username"
+                                                name="username"
+                                                autoComplete="off"
+                                                value={formData.username} onChange={handleChange}
+                                                required={true}
+                                            />
+                                        </CInputGroup>
+                                        <CInputGroup className="mb-4">
+                                            <CInputGroupText>
+                                                <CIcon icon={cilLockLocked} />
+                                            </CInputGroupText>
+                                            <CFormInput
+                                                type="password"
+                                                placeholder="Password"
+                                                name="password"
+                                                value={formData.password} onChange={handleChange}
+                                                required={true}
+                                            />
+                                        </CInputGroup>
+                                        <div>
+                                            {loading ? (
+                                                ''
+                                            ) : (
+                                                <CRow>
+                                                    <CCol xs={6}>
+                                                        <CButton type="submit" data-testid="login-button" className="px-4 customcolorPrimary">
+                                                            Log in
+                                                        </CButton>
+                                                    </CCol>
+                                                </CRow>
+                                            )}
                                         </div>
-                                        <div className="d-flex justify-content-between">
-                                            <button className="btn btn-primary" type="submit">Log in</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                    </CForm>
+                                </CCardBody>
+                            </CCard>
+                        </CCardGroup>
+                    </CCol>
+                </CRow>
+            </CContainer>
         </div>
+        // <div className="bg-white min-vh-100 d-flex flex-row align-items-center">
+        //     <div className="container">
+        //         <div className="row justify-content-center">
+        //             <div className="col-md-6">
+        //                 <div className="card-group mb-0">
+        //                     <div className="card p-4">
+        //                         <div className="card-body">
+        //                             <form onSubmit={handleSubmit}>
+        //                                 <h1 className="text-center mb-4">Login</h1>
+        //                                 <p className="text-muted text-center">Sign in to your account</p>
+        //                                 {errMsg && (
+        //                                     <div className="alert alert-danger" role="alert">
+        //                                         {errMsg}
+        //                                     </div>
+        //                                 )}
+        //                                 <div className="mb-3">
+        //                                     <div className="input-group">
+        //                                         <span className="input-group-text" id="username-addon">
+        //                                             <i className="cil-user"></i>
+        //                                         </span>
+        //                                         <input
+        //                                             type="text"
+        //                                             className="form-control"
+        //                                             placeholder="Username"
+        //                                             name="username"
+        //                                             autoComplete="off"
+        //                                             value={formData.username}
+        //                                             onChange={handleChange}
+        //                                             required
+        //                                         />
+        //                                     </div>
+        //                                 </div>
+        //                                 <div className="mb-4">
+        //                                     <div className="input-group">
+        //                                         <span className="input-group-text" id="password-addon">
+        //                                             <i className="cil-lock-locked"></i>
+        //                                         </span>
+        //                                         <input
+        //                                             type="password"
+        //                                             className="form-control"
+        //                                             placeholder="Password"
+        //                                             name="password"
+        //                                             value={formData.password}
+        //                                             onChange={handleChange}
+        //                                             required
+        //                                         />
+        //                                     </div>
+        //                                 </div>
+        //                                 <div className="d-flex justify-content-between">
+        //                                     <button className="btn btn-primary" type="submit">Log in</button>
+        //                                 </div>
+        //                             </form>
+        //                         </div>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </div>
+        // </div>
 
     )
 }
