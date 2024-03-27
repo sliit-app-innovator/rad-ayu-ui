@@ -35,7 +35,8 @@ function MedicineForm() {
         code: '',
         type: '1', // 'Raw Material' or 'Product'
         medicineType: '',
-        unit: ''
+        unit: '',
+        isExpire: 0
     });
     const [categoryOptions, setCategoryOptions] = useState([]);
 
@@ -52,6 +53,11 @@ function MedicineForm() {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    const handleCheckboxChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: e.target.checked ? 1 : 0 }));
+    }
 
     const handleCategoryChange = (selectedOption) => {
         setFormData(prev => ({ ...prev, medicineType: selectedOption.value }));
@@ -316,6 +322,10 @@ function MedicineForm() {
                                     <CFormCheck type="radio" name="type" id="rawMaterial" label="Raw Material" value="0" onChange={handleChange} checked={formData.type == '0'} />
                                 </CCol>
 
+                                <CCol md={2}>
+                                    <CFormCheck type="checkbox" id="isExpire" name='isExpire' label="Is Expiring Medicine" onChange={handleCheckboxChange} checked={formData.isExpire == '1'} />
+
+                                </CCol>
 
                             </CRow>
                             <p></p>
