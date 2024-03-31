@@ -47,22 +47,15 @@ const storeUrl = '/store'
 const StockRetrieval = () => {
 
     const navigate = useNavigate()
-    const location = useLocation()
-    const from = location.state?.from?.pathname || '/billing/new'
-    let { holdId } = useParams()
     const inputRef = useRef(null);
     // Form Data 
-    const [loadingHold, setloadingHold] = React.useState(false);
-    const [loadHolded, setloadHolded] = React.useState('');
+
     const [Item, setItem] = React.useState('');
     const [Unit, setUnit] = React.useState('');
     const [ItemName, setItemName] = React.useState('');
     const [code, setCode] = React.useState('');
     const [stores, setStores] = React.useState([]);
-
-    const [Price, setPrice] = React.useState('');
     const [Qty, setQty] = React.useState(0);
-    const [Amount, setAmount] = React.useState('');
     const [loading, setLoading] = React.useState(false)
     const axiosPrivate = useAxiosPrivate();
     const [validated, setValidated] = React.useState(false)
@@ -70,20 +63,13 @@ const StockRetrieval = () => {
     const [dataBill, setdataBill] = useState([]);
     const [totalRows, setTotalRows] = useState(0);
     const [perPage, setPerPage] = useState(5);
-    const [perPageBill, setperPageBill] = useState(20);
     const [currentPage, setCurrentPage] = useState(1);
     const [editMode, setEditMode] = React.useState(false)
     const [searchMode, setEsearchMode] = React.useState(false)
-    const [TotalAmount, setTotalAmount] = React.useState(0.00)
     const [_id, setId] = React.useState('')
     const [user] = React.useState(localStorage.getItem("currentUser"))
-    const [submitLabel, setSubmitLabel] = React.useState('Save')
     const [searchText, setSearch] = React.useState('')
-
-
-    const [purchaseDate, setpurchaseDate] = useState(new Date());
     const [today] = useState(new Date());
-
     const [Lotvisible, setLotVisible] = React.useState(false)
     const [isLot, setIsLot] = React.useState(false)
     const [isExpire, setIsExpire] = React.useState(false)
@@ -136,13 +122,6 @@ const StockRetrieval = () => {
 
     }
 
-    const handleRowExpand = (row) => {
-        const isRowExpanded = expandedRows.includes(row.id);
-        const newExpandedRows = isRowExpanded
-            ? expandedRows.filter((id) => id !== row.id)
-            : [...expandedRows, row.id];
-        setExpandedRows(newExpandedRows);
-    };
 
     const AddRow = async () => {
 
@@ -195,10 +174,7 @@ const StockRetrieval = () => {
         setItemName('')
         setCode('')
         setUnit('')
-        setPrice(0.00);
         setQty(0);
-        setAmount(0.00);
-
         setLotVisible(false)
         setIsLot(false)
         setIsExpire(false)
@@ -260,18 +236,14 @@ const StockRetrieval = () => {
     const handleSubmit = async (event) => {
         console.log(event);
         event.preventDefault()
-        const form = event.currentTarget
         let validate = await checkValidity();
         if (validate.status === false) {
             event.stopPropagation()
             swal("Validation", validate.message, "warning");
             return false
         }
-
         setValidated(true)
         setLoading(true);
-
-
         formData['medicineList'] = dataBill;
         submitForm(formData, event)
     }
@@ -315,21 +287,6 @@ const StockRetrieval = () => {
         setTotalRows(response.data.total);
     };
 
-
-    const fetchSuppliers = async () => {
-        setLoading(true);
-        let customerArray = []
-
-        const response = await axiosPrivate.get(
-            supplierUrl
-        );
-        response.data.map((customer) => {
-            return customerArray.push({ value: customer._id, label: customer.Name });
-        });
-
-        setLoading(false);
-    };
-
     const fetchStore = async () => {
         setLoading(true);
         let storesArray = []
@@ -348,8 +305,6 @@ const StockRetrieval = () => {
     useEffect(() => {
         fetchStore()
         fetchItems(1)
-        // fetchGrnNo()
-        // fetchSuppliers()
     }, []);
 
 
@@ -371,15 +326,10 @@ const StockRetrieval = () => {
             })
                 .then(async (willDelete) => {
                     if (willDelete) {
-                        console.log('reset with holdId', holdId);
-                        if (holdId && holdId !== 'new') {
-                            console.log('reset with holdId');
-                            navigate(from, { replace: true })
-                        }
                         resetPage()
                     }
                 });
-        }, [holdId]
+        }, []
 
     );
 
@@ -448,19 +398,7 @@ const StockRetrieval = () => {
         },
         [dataBill]
     );
-    const calculateTotalAmount = async (items) => {
-        if (!items || items.length === 0) {
-            setTotalAmount(0.00)
-            return false
-        }
-        let sum = items.map(o => o.Amount).reduce((a, c) => { return Number(a) + Number(c) });
-        setTotalAmount(sum)
-    }
 
-    const calculateAmount = async (p, q) => {
-        let amount = Number(p) * Number(q)
-        setAmount(amount.toFixed(2))
-    }
 
 
     const columns = useMemo(
