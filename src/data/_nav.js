@@ -51,7 +51,12 @@ const _nav = [
                 to: '/stock-retrieval',
                 icon: <CIcon icon={cilShare} customClassName="nav-icon" />,
             },
-
+            {
+                component: CNavItem,
+                name: 'Stock Transfer',
+                to: '/stock-retrieval',
+                icon: <CIcon icon={cilShare} customClassName="nav-icon" />,
+            },
             {
                 component: CNavItem,
                 name: 'Medicine Issuing',
