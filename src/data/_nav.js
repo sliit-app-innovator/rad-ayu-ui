@@ -4,7 +4,7 @@ import {
     cilAddressBook,
     cilApplications,
     cilBuilding,
-    cilPeople, cilSettings, cilShare, cilStorage, cilUser,
+    cilPeople, cilSearch, cilSettings, cilShare, cilStorage, cilUser,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -62,6 +62,13 @@ const _nav = [
                 name: 'Medicine Issuing',
                 to: '/medicine-Issuing',
                 icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+            },
+
+            {
+                component: CNavItem,
+                name: 'Stock Inquiries',
+                to: '/stock-inquiries',
+                icon: <CIcon icon={cilSearch} customClassName="nav-icon" />,
             },
         ],
     },
