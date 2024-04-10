@@ -11,6 +11,7 @@ import {
     CRow,
     CFormCheck,
     CSpinner,
+    CInputGroup,
 } from '@coreui/react';
 import Select from 'react-select';
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -36,7 +37,8 @@ function MedicineForm() {
         type: '1', // 'Raw Material' or 'Product'
         medicineType: '',
         unit: '',
-        isExpire: 0
+        isExpire: 1,
+        reorderLevel: 0
     });
     const [categoryOptions, setCategoryOptions] = useState([]);
 
@@ -161,6 +163,11 @@ function MedicineForm() {
                 sortable: false,
             },
             {
+                name: "Reorder Level",
+                selector: row => row.reorderLevel,
+                sortable: false,
+            },
+            {
                 name: "Action",
                 width: "120px",
                 sortable: false,
@@ -210,7 +217,9 @@ function MedicineForm() {
             code: '',
             type: '1', // 'Raw Material' or 'Product'
             medicineType: '',
-            unit: ''
+            unit: '',
+            reorderLevel: 0,
+            isExpire: 1
         });
         handleUnitChange({ value: '' })
         setEditMode(false);
@@ -312,22 +321,26 @@ function MedicineForm() {
                             </CRow>
                             <p></p>
                             <CRow className="mb-3">
-                                <CCol md={2}>
+                                <CCol md={3}>
+                                    <CFormLabel htmlFor="reorderLevel">Reorder Level</CFormLabel>
+                                    <CFormInput type="number" id="reorderLevel" name="reorderLevel" required value={formData.reorderLevel} onChange={handleChange} />
+                                </CCol>
+                                <CCol md={3}>
                                     <CFormLabel>Item Type</CFormLabel>
+                                    <CInputGroup>
+                                        <CFormCheck type="radio" name="type" id="product" label="Product    " value="1" onChange={handleChange} checked={formData.type == '1'} />
+                                        <CCol md={1}></CCol>
+                                        <CFormCheck type="radio" name="type" id="rawMaterial" label="Raw Material   " value="0" onChange={handleChange} checked={formData.type == '0'} />
+                                    </CInputGroup>
                                 </CCol>
                                 <CCol md={2}>
-                                    <CFormCheck type="radio" name="type" id="product" label="Product" value="1" onChange={handleChange} checked={formData.type == '1'} />
-                                </CCol>
-                                <CCol md={2}>
-                                    <CFormCheck type="radio" name="type" id="rawMaterial" label="Raw Material" value="0" onChange={handleChange} checked={formData.type == '0'} />
-                                </CCol>
-
-                                <CCol md={2}>
+                                    <CFormLabel>Maintaining Lots or Not</CFormLabel>
                                     <CFormCheck type="checkbox" id="isExpire" name='isExpire' label="Is Expiring Medicine" onChange={handleCheckboxChange} checked={formData.isExpire == '1'} />
 
                                 </CCol>
-
                             </CRow>
+                            <p></p>
+
                             <p></p>
                             <br></br>
                             <CRow>

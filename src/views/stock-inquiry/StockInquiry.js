@@ -102,7 +102,12 @@ const StockInquiry = () => {
                 sortable: true,
                 width: "150px",
             },
-
+            {
+                name: "Re-Order Level",
+                selector: row => row.reorderLevel,
+                sortable: true,
+                width: "130px",
+            },
             {
                 name: "Qty",
                 selector: row => row.quantity,
@@ -172,7 +177,7 @@ const StockInquiry = () => {
             {expandedRowData?.length === 0 ? <CAlert color='default'>No Lots Available</CAlert> : <CCard>
                 <CCardHeader>
                     <CCardTitle>
-                        <span>Lot Details  </span>
+                        <span> <small>Lot Details </small> </span>
                     </CCardTitle>
                 </CCardHeader>
                 <CCardBody>
@@ -180,10 +185,10 @@ const StockInquiry = () => {
                     <table className='table   table-responsive  table-hover'>
                         <thead>
                             <tr>
-                                <th><CFormLabel htmlFor="lotNumber">Lot Number</CFormLabel></th>
-                                <th><CFormLabel htmlFor="issue">Available Qty</CFormLabel></th>
-                                <th><CFormLabel htmlFor="expireDate">Expire Date</CFormLabel></th>
-                                <th><CFormLabel htmlFor="receivedDate">Received Date</CFormLabel></th>
+                                <th> <small>Lot Number </small></th>
+                                <th><small> Available Qty </small></th>
+                                <th> <small> Expire Date</small> </th>
+                                <th> <small> Received Date </small></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -193,17 +198,17 @@ const StockInquiry = () => {
                                     <tr key={index}>
 
                                         <td>
-                                            {lot.lotNum}
+                                            <small>  {lot.lotNum}</small>
                                         </td>
                                         <td>
-                                            {lot.quantity}
+                                            <small>  {lot.quantity}</small>
                                         </td>
 
                                         <td>
-                                            {lot.expiryDate}
+                                            <small> {lot.expiryDate}</small>
                                         </td>
                                         <td>
-                                            {lot.purchaseDate}
+                                            <small> {lot.purchaseDate}</small>
                                         </td>
 
                                     </tr>
