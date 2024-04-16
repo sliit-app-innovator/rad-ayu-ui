@@ -77,6 +77,7 @@ const StockRetrieval = () => {
     const [currentRow, setCurrentRow] = useState([])
     const [expandedRows, setExpandedRows] = useState([]);
     const [qtyError, setQtyError] = React.useState(false)
+    const [expirePopupErrors,setExpirePopupErrors] = React.useState('')
 
 
     const handleStoreChange = (selectedOption) => {
@@ -186,10 +187,18 @@ const StockRetrieval = () => {
         setQtyError(false)
         let data = [...inputFields];
         let qtySum = data.map(o => Number(o.expireQty)).reduce((a, c) => { return a + c });
+        const hasEmptyExpireDates = data.some(o => o.expireDate === '' || o.expireQty === '');
         console.log('sum value', qtySum);
+
+
+
         if (qtySum != Qty) {
+            setExpirePopupErrors('Qty and Expire Dates are not Equal')
             setQtyError(true)
-        } else {
+        } else if (hasEmptyExpireDates) {
+            setExpirePopupErrors('Please Enter Expire Dates')
+            setQtyError(true)
+        }else{
             addItemToGrid()
         }
     }
@@ -700,7 +709,7 @@ const StockRetrieval = () => {
                                             {qtyError ?
                                                 (
                                                     <CAlert color="danger">
-                                                        Expire Date Qty not Match with Item Qty
+                                                        {expirePopupErrors}
                                                     </CAlert>
                                                 ) : (<p></p>)
                                             }

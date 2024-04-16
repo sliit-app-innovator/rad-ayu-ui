@@ -134,6 +134,22 @@ const StockInquiry = () => {
 
     }
 
+    const customStyles = [
+        {
+            when: row => row.reorderLevel>0 && row.quantity<row.reorderLevel,
+            style: {
+              backgroundColor: '#f39c1994',
+              fontSize: '16px', 
+            },
+          },
+          {
+            when: row => row.reorderLevel>0 && row.quantity>row.reorderLevel,
+            style: {
+              backgroundColor: '#2eb85c92',
+              fontSize: '16px', 
+            },
+          },
+    ]
 
 
     const fetchItems = async (page, searchValue = searchText, size = perPage, selectedStore = store) => {
@@ -185,6 +201,7 @@ const StockInquiry = () => {
                     <table className='table   table-responsive  table-hover'>
                         <thead>
                             <tr>
+                            <th> <small>Store </small></th>
                                 <th> <small>Lot Number </small></th>
                                 <th><small> Available Qty </small></th>
                                 <th> <small> Expire Date</small> </th>
@@ -197,6 +214,9 @@ const StockInquiry = () => {
 
                                     <tr key={index}>
 
+ <td>
+                                            <small>  {lot.store}</small>
+                                        </td>
                                         <td>
                                             <small>  {lot.lotNum}</small>
                                         </td>
@@ -258,7 +278,7 @@ const StockInquiry = () => {
                                 expandableRows
                                 expandableRowsComponent={ExpandComponentItem}
                                 onRowExpandToggled={(bool, row) => handleRowExpandToggled(bool, row)}
-
+                                conditionalRowStyles={customStyles}
                             />
                         </CRow>
                     </CCardBody>

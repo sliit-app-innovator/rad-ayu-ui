@@ -79,6 +79,7 @@ const StockRetrieval = () => {
     const [currentRow, setCurrentRow] = useState([])
     const [expandedRows, setExpandedRows] = useState([]);
     const [qtyError, setQtyError] = React.useState(false)
+    const [lotsErrors, setLotsErrors] = React.useState('')
 
 
     const [issueTypes, setIssueTypes] = useState([
@@ -205,14 +206,32 @@ const StockRetrieval = () => {
     }
     const setIssueMedicineQty = async () => {
         setQtyError(false)
+        if(currentLot.length===0){
+            setLotsErrors('no Lots Available for this Medicine')
+            setQtyError(true)
+            return false
+        }
 
         let qtySum = currentLot.map(o => Number(o.issueQty)).reduce((a, c) => { return a + c });
         if (qtySum === 0) {
             setQtyError(true)
-        } else {
-            setQty(qtySum)
-            addItemToGrid()
+            setLotsErrors('Please Enter Issue Qty')
+            return false
+        }  
+
+        const problematicLots = currentLot.filter(o => o.issueQty > o.quantity);
+        if (problematicLots.length > 0) {
+            setQtyError(true)
+            setLotsErrors('Issue Qty is Greater than Available Qty')
+            return false
         }
+
+        
+
+        
+        setQty(qtySum)
+        addItemToGrid()
+         
     }
 
     const checkValidity = async () => {
@@ -851,7 +870,7 @@ const StockRetrieval = () => {
                                                 {qtyError ?
                                                     (
                                                         <CAlert color="danger">
-                                                            Issue Quantity is Required
+                                                            {lotsErrors}
                                                         </CAlert>
                                                     ) : (<p></p>)
                                                 }
