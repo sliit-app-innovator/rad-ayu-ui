@@ -15,7 +15,6 @@ artifacts:
   files:
     - '**/*'
     - '../appspec.yml'
-    - '../cleanup_before_install.sh'
   base-directory: 'build' # adjust the build output directory according to your project structure
 cache:
   paths:
