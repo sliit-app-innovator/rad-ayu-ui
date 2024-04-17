@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18.20.1
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - echo Building the React application...
+      - npm run build
+artifacts:
+  files:
+    - '**/*'
+    - appspec.yml
+    - cleanup_before_install.sh
+  base-directory: 'build' # adjust the build output directory according to your project structure
+cache:
+  paths:
+    - 'node_modules/**/*'

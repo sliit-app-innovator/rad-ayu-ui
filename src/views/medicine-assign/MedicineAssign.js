@@ -80,6 +80,7 @@ const StockRetrieval = () => {
     const [expandedRows, setExpandedRows] = useState([]);
     const [qtyError, setQtyError] = React.useState(false)
     const [lotsErrors, setLotsErrors] = React.useState('')
+    const [singleLot,setSingleLot]=React.useState(false)
 
 
     const [issueTypes, setIssueTypes] = useState([
@@ -473,6 +474,7 @@ const StockRetrieval = () => {
 
     const handleEdit = useCallback(
         row => async () => {
+            setSingleLot(false)
             const data = await getAvailableLots(row.id);
             setCurrentLot(data)
             console.log('this is received data')
@@ -487,6 +489,7 @@ const StockRetrieval = () => {
             element.focus()
             setEsearchMode(false);
             console.log('is Lot', isLot);
+             
             if (data && data.length > 0) {
                 setLotVisible(true)
                 setIsLot(true)
