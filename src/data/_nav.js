@@ -54,7 +54,7 @@ const _nav = [
             {
                 component: CNavItem,
                 name: 'Stock Transfer',
-                to: '/stock-retrieval',
+                to: '/stock-transfer',
                 icon: <CIcon icon={cilShare} customClassName="nav-icon" />,
             },
             {
