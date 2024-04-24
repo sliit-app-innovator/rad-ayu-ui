@@ -84,6 +84,10 @@ const StockRetrieval = () => {
         setFormData(prev => ({ ...prev, storeId: selectedOption.value }));
     };
 
+    const handleToStoreChange = (selectedOption) => {
+        setFormData(prev => ({ ...prev, toStoreId: selectedOption.value }));
+    };
+
     const setpurchaseDateValue = (date) => {
         setFormData(prev => ({ ...prev, date: date }));
     }
@@ -91,9 +95,11 @@ const StockRetrieval = () => {
     const [formData, setFormData] = useState({
         id: '',
         storeId: '',
+        toStoreId: '',
         date: new Date(),
         source: '',
         requestBy: '',
+        requisition:"",
         approvedBy: '',
         description: '',
         medicineList: []
@@ -113,6 +119,7 @@ const StockRetrieval = () => {
         setFormData({
             id: '',
             storeId: '',
+            toStoreId: '',
             date: new Date(),
             source: '',
             requestBy: '',
@@ -513,35 +520,36 @@ const StockRetrieval = () => {
                         <strong>Stock Transfer</strong>
                     </CCardHeader>
                     <CCardBody>
+                    <p></p>
                         <CForm className="row g-3 needs-validation" validated={validated} onSubmit={handleSubmit}>
                             {/* <pre>{JSON.stringify(dataBill, null, 2)}  </pre> */}
                             <CRow>
-                                <CCol md={6}>
+                                <CCol md={5}>
+                                    <CFormLabel htmlFor="requisition">Requisition Number</CFormLabel>
+                                    <CFormInput type="text" id="requisition" name="requisition" required value={formData.requisition} onChange={handleChange} />
+                                </CCol>
+                            </CRow>
+                            <CRow>
+                                <CCol md={5}>
                                     <CFormInput type="hidden" id="user" name='user' value={user} />
-                                    <CFormLabel htmlFor="Store">Store</CFormLabel>
+                                    <CFormLabel htmlFor="Store">From Store</CFormLabel>
                                     <Select options={stores} onChange={handleStoreChange} name='storeId' id='storeId' required={true} value={stores.find(a => a.value === formData.storeId) ?? ''} />
                                 </CCol>
-                                <CCol md={4} />
-
+                                <CCol md={5}>
+                                    <CFormLabel htmlFor="Source">To Store</CFormLabel>
+                                    <Select options={stores} onChange={handleToStoreChange} name='toStoreId' id='toStoreId' required={true} value={stores.find(a => a.value === formData.toStoreId) ?? ''} />
+                                </CCol>
                                 <CCol md={2}>
                                     <CFormLabel htmlFor="Name">Date</CFormLabel>
                                     <DatePicker maxDate={today} name='date' style={{ textAlign: 'right' }} className='form-control text-right' selected={formData.date} onChange={(date) => setpurchaseDateValue(date)} required={true} />
                                 </CCol>
-
-
                             </CRow>
                             <CRow>
-                                <CCol md={6}>
-                                    <CFormLabel htmlFor="Source">Source</CFormLabel>
-                                    <CFormInput type="text" id="source" name="source" required value={formData.source} onChange={handleChange} />
-                                </CCol>
-                                <CCol md={6}>
+                                <CCol md={5}>
                                     <CFormLabel htmlFor="requestBy">Request By</CFormLabel>
                                     <CFormInput type="text" id="requestBy" name="requestBy" required value={formData.requestBy} onChange={handleChange} />
                                 </CCol>
-                            </CRow>
-                            <CRow>
-                                <CCol md={6}>
+                                <CCol md={5}>
                                     <CFormLabel htmlFor="approved_by">Approved By</CFormLabel>
                                     <CFormInput type="text" id="approvedBy" name="approvedBy" required value={formData.approvedBy} onChange={handleChange} />
                                 </CCol>
