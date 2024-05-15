@@ -5,6 +5,7 @@ const Store = React.lazy(() => import('./views/store/Store'))
 const Home = React.lazy(() => import('./views/dashboard/dashboard'))
 const Medicine = React.lazy(() => import('./views/medicine/Medicine'))
 const Ward = React.lazy(() => import('./views/ward/Ward'))
+const Unit = React.lazy(() => import('./views/unit/Unit'))
 const StockRetrieval = React.lazy(() => import('./views/stock-retrieval/StockRetrieval'))
 const StockTransfer = React.lazy(() => import('./views/stock-transfer/StockTransfer'))
 const AssignMedicines = React.lazy(() => import('./views/medicine-assign/MedicineAssign'))
@@ -16,6 +17,7 @@ const routes = [
     { path: '/user', name: 'User', element: User },
     { path: '/medicine', name: 'Medicine', element: Medicine },
     { path: '/ward', name: 'Ward', element: Ward },
+    { path: '/unit', name: 'Unit', element: Unit },
     { path: '/stock-retrieval', name: 'StockRetrieval', element: StockRetrieval },
     { path: '/stock-transfer', name: 'StockTransfer', element: StockTransfer },
     { path: '/medicine-Issuing', name: 'AssignMedicines', element: AssignMedicines },

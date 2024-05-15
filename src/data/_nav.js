@@ -1,6 +1,7 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
+    cilHealing,
     cilAddressBook,
     cilApplications,
     cilBuilding,
@@ -36,6 +37,12 @@ const _nav = [
                 name: 'Medicine Management',
                 to: '/medicine',
                 icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
+            },
+            {
+                component: CNavItem,
+                name: 'Unit Management',
+                to: '/unit',
+                icon: <CIcon icon={cilHealing} customClassName="nav-icon" />,
             },
         ],
     },
