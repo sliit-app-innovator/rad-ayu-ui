@@ -11,7 +11,8 @@ import './app.css'
 
 
 import SimpleBar from 'simplebar-react'
-
+import { cib500px, cil4k } from '@coreui/icons'
+import logoIcon from '../assets/logo.png'
 
 const AppSidebar = () => {
 
@@ -33,7 +34,8 @@ const AppSidebar = () => {
         >
             <CSidebarBrand className="cd" to="/">
                 {/* <CIcon className="md" icon={logoNegative} height={75} width={250} /> */}
-                {/* <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} /> */}
+                <img src={logoIcon} alt="Icon Description" height="75"  />
+                {/* <CIcon className="md" icon={logoIcon} height={75} width={250} /> */}
             </CSidebarBrand>
             <CSidebarNav>
                 <SimpleBar>

@@ -51,7 +51,7 @@ const AppHeader = () => {
         <CHeader position="sticky" className="mb-4 mb-4-new" >
             <CContainer fluid className="r2">
                 <CHeaderToggler className="ps-1">
-                    <CNavLink to="/dashboard" component={NavLink}>
+                    <CNavLink to="/" component={NavLink}>
                         <strong>  <CIcon icon={cilHome} size='xl'></CIcon>  AYU </strong>
                     </CNavLink>
                 </CHeaderToggler>
