@@ -19,7 +19,7 @@ const DashboardCard = ({ title, subtitle, mainValue, subValue, subValueLabel , i
 
     const getStatusColor = (value) => {
         
-        value = Number(value.replace('%',''));
+        value = Number(value);
         if(value >= 85 ){
             return '#28a745'; // Green
         }else if(value >= 50 && value <= 85){
@@ -68,7 +68,7 @@ const DashboardCard = ({ title, subtitle, mainValue, subValue, subValueLabel , i
                 </CCol>
                 <CCol>
                     <div style={{ fontSize: '18px', fontWeight: 'bold', textAlign: 'right', color: getStatusColor(subValue) }}>
-                        {subValue}
+                        {subValue}%
                     </div>
                     <div style={{ fontSize: '16px', color: getStatusColor(subValue) , textAlign:'right' }}>
                         {subValueLabel}

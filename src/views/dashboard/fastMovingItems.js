@@ -3,7 +3,7 @@ import { CCard, CCardBody, CCardHeader, CProgress } from '@coreui/react';
 
 const FastMovingItems = ({ items }) => {
     // Determine the maximum quantity for scaling the progress bars
-    const maxQuantity = Math.max(...items.map(item => item.quantity));
+    const maxQuantity = Math.max(...items.map(item => item.issued));
 
     return (
         <CCard className="mb-4 shadow-sm" style={{ border: 'none' }}>
@@ -24,13 +24,18 @@ const FastMovingItems = ({ items }) => {
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.quantity}</td>
+                                    <td>{item.issued}</td>
                                     <td>
                                         <CProgress 
-                                            color={item.quantity === maxQuantity ? 'success' : 'info'}
-                                            value={(item.quantity / maxQuantity) * 100}
+                                            color={item.issued === maxQuantity ? 'success' : 'info'}
+                                            value={(item.issued / maxQuantity) * 100}
                                             showValue
-                                        />
+                                        >
+
+                                            <div className="progress-bar-text">
+                                                {Math.round((item.issued / maxQuantity) * 100)}%
+                                            </div>
+                                        </CProgress>
                                     </td>
                                 </tr>
                             ))}
