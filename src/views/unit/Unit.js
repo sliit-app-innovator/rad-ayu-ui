@@ -223,7 +223,7 @@ function UnitForm() {
                             <CRow>
                                 <CCol xs={2}>
                                     <CButton color="primary" className='form-control' type="submit" disabled={loading}>
-                                        {loading ? <CSpinner size="sm" /> : 'Save Unit'}
+                                        {loading ? <CSpinner size="sm" /> : submitLabel}
                                     </CButton>
                                 </CCol>
                                 <CCol xs={2}>
