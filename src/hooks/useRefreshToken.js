@@ -4,6 +4,7 @@ import axios from '../config/axios'
 const useRefreshToken = () => {
     const refresh = async () => {
         const token = localStorage.getItem("refreshToken")
+        try {
         const response = await axios.post('/auth/refresh', JSON.parse(token));
         
         if (response.data === "Invalid refresh token") {
@@ -18,6 +19,14 @@ const useRefreshToken = () => {
             localStorage.setItem('accessToken', response.data.refreshToken)
             // console.log('refreshed token', response.data.refreshToken)
         }
+    } catch (error) {
+        swal('Session Expired', 'Please login again', 'error');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        // Redirect to login page
+        window.location.reload()
+        throw error;
+    }
         return response.data.refreshToken
     }
     return refresh
