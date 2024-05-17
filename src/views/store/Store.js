@@ -94,7 +94,7 @@ function StoreForm() {
     const handleSelectStoreType = (selectedOption) => {
         setFormData(prevState => ({
             ...prevState,
-            storeType: selectedOption.value
+            type: selectedOption.value
         }));
     };
 
@@ -247,11 +247,13 @@ function StoreForm() {
                                 </CCol>
                                 <CCol md={6}>
                                     <CFormLabel htmlFor="type">Store Type</CFormLabel>
+                                    
                                     <Select
                                         name="type"
+                                        id='type'
                                         options={storeTypes}
                                         onChange={handleSelectStoreType}
-                                        value={storeTypes.find(type => type.value === formData.type)}
+                                        value={storeTypes.find(type => type.value === formData.type)?? ''}
                                         isLoading={loading}
                                         required
                                     />
