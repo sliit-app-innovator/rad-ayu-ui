@@ -15,8 +15,9 @@ const FastExpiringItems = ({ items }) => {
                             <tr>
                                 <th>#</th>
                                 <th>Item Name</th>
-                                <th>Quantity</th>
-                                <th>Progress</th>
+                                <th>Lot#</th>
+                                <th>Qty</th>
+                                <th>Days</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -24,13 +25,10 @@ const FastExpiringItems = ({ items }) => {
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.quantity}</td>
+                                    <td>{item.lotNumber}</td>
+                                    <td>{item.qty}</td>
                                     <td>
-                                        <CProgress 
-                                            color={item.quantity === maxQuantity ? 'danger' : 'warning'}
-                                            value={(item.quantity / maxQuantity) * 100}
-                                            showValue
-                                        />
+                                        {item.days}
                                     </td>
                                 </tr>
                             ))}
