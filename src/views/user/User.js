@@ -78,6 +78,7 @@ function UserForm() {
         designation: '',
         userRole: '',
         departmentId: '',
+        email:''
     };
     const [formData, setFormData] = useState(initialUserData);
 
@@ -337,13 +338,22 @@ function UserForm() {
                                     <p></p>
                                     <CRow>
                                         <CCol md={6}>
-                                            <CFormLabel htmlFor="userRole">Role  <span className='required-flag'>*</span> </CFormLabel>
-                                            <Select onChange={handleSelectRole} aria-label="userRole" name="userRole" id="userRole" options={userRoleList} value={userRoleList.find(a => a.value === formData.userRole) ?? ''} required />
+                                            <CFormLabel htmlFor="email">Email  <span className='required-flag'>*</span> </CFormLabel>
+                                            <CFormInput type='email' data-testid="email" id="email" required name="email" value={formData.email} onChange={handleChange}></CFormInput>
                                         </CCol>
                                         <CCol md={6}>
                                             <CFormLabel htmlFor="departmentId">Department  <span className='required-flag'>*</span> </CFormLabel>
                                             <Select onChange={handleSelectDepartment} aria-label="departmentId" name="departmentId" id="departmentId" options={departmentList} value={departmentList.find(a => a.value === formData.departmentId) ?? ''} required />
                                         </CCol>
+
+                                    </CRow>
+                                    <p></p>
+                                    <CRow>
+                                        <CCol md={6}>
+                                            <CFormLabel htmlFor="userRole">Role  <span className='required-flag'>*</span> </CFormLabel>
+                                            <Select onChange={handleSelectRole} aria-label="userRole" name="userRole" id="userRole" options={userRoleList} value={userRoleList.find(a => a.value === formData.userRole) ?? ''} required />
+                                        </CCol>
+                                        
 
                                     </CRow>
                                     <p></p>

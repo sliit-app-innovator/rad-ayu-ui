@@ -39,7 +39,7 @@ function WardForm() {
         { value: 1, label: 'General' },
         { value: 2, label: 'Paediatric' },
         { value: 3, label: 'Maternity' },
-        { value: 3, label: 'Surgical' },
+        { value: 4, label: 'Surgical' },
     ])
 
     const [formData, setFormData] = useState(initialData);
