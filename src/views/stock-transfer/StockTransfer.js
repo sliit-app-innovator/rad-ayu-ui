@@ -329,10 +329,12 @@ const StockTransfer = () => {
         setValidated(true)
         setLoading(true);
 
+        debugger
         const itemList = dataBill.map((item) => {
             console.log(item)
-            return { medicine_id: item.id, qty: item.qty, isLot:item.isLot, lots: item.lots }
+            return { medicine_id: item.id, qty: item.qty, is_lot:item.isLot, lots: item.lots }
         })
+
 
         formData['items'] = itemList;
         formData['from_store'] = formData.fromStore;
