@@ -6,6 +6,10 @@ import {
     cilApplications,
     cilBuilding,
     cilPeople, cilSearch, cilSettings, cilShare, cilStorage, cilUser,
+    cilReload,
+    cilCart,
+    cilHandshake,
+    cilTransfer,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -48,29 +52,48 @@ const _nav = [
     },
     {
         component: CNavGroup,
-        name: 'Transactions ',
+        name: 'Stock ',
         to: '/transactions',
         icon: <CIcon icon={cilApplications} customClassName="nav-icon" />,
         items: [
             {
                 component: CNavItem,
-                name: 'Stock Retrieval',
+                name: 'Medicine Receiving',
                 to: '/stock-retrieval',
-                icon: <CIcon icon={cilShare} customClassName="nav-icon" />,
+                icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
             },
             {
                 component: CNavItem,
-                name: 'Stock Transfer',
-                to: '/stock-transfer',
-                icon: <CIcon icon={cilShare} customClassName="nav-icon" />,
+                name: 'Medicine Request',
+                to: '/stock-request',
+                icon: <CIcon icon={cilHandshake} customClassName="nav-icon" />,
             },
+            {
+                component: CNavItem,
+                name: 'Medicine Transfer',
+                to: '/stock-transfer',
+                icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
+            },
+            {
+                component: CNavItem,
+                name: 'Stock Inquiries',
+                to: '/stock-inquiries',
+                icon: <CIcon icon={cilSearch} customClassName="nav-icon" />,
+            },
+        ],
+    },
+    {
+        component: CNavGroup,
+        name: 'Ward/OPD ',
+        to: '/transactions',
+        icon: <CIcon icon={cilApplications} customClassName="nav-icon" />,
+        items: [
             {
                 component: CNavItem,
                 name: 'Medicine Issuing',
                 to: '/medicine-Issuing',
                 icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
             },
-
             {
                 component: CNavItem,
                 name: 'Stock Inquiries',

@@ -180,7 +180,7 @@ const fetcInitialData = async (id) => {
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie data={pieData} cx="50%"  activeIndex={activeIndex} cy="50%" outerRadius={80} fill="#8884d8" dataKey="availableStock" label onMouseEnter={onPieEnter}>
-                                {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#33FFF5', '#FFC733', '#9333FF', '#FF3381', '#33FF85', '#FF7F33'][index % pieData.length]} />)}
+                                {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28AFF', '#FF6666', '#66CC66', '#FFD700', '#8A2BE2', '#FF4500'][index % pieData.length]} />)}
                             </Pie>
                             <Legend align="center" verticalAlign="bottom" layout="horizontal" />
                         </PieChart>

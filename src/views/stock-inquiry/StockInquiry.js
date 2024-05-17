@@ -281,6 +281,17 @@ const StockInquiry = () => {
                                 conditionalRowStyles={customStyles}
                             />
                         </CRow>
+
+                        <CRow>
+                        <CCol xs={8}></CCol>
+                            <CCol xs={2}>
+                                <li className='btn' style={{backgroundColor:'#87d6a1'}}>Sufficient Stock</li>
+                            </CCol>
+                            <CCol xs={2}>
+                                <li className='btn' style={{backgroundColor:'#f8c579'}}>Insufficient Stock</li>
+                            </CCol>
+                        </CRow>
+
                     </CCardBody>
                 </CCard>
             </CCol>
