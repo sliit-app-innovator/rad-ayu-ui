@@ -128,6 +128,7 @@ const StockRetrieval = () => {
             approvedBy: '',
             description: '',
             items: []
+            
         });
 
     }
@@ -275,10 +276,16 @@ const StockRetrieval = () => {
         setValidated(true)
         setLoading(true);
         const itemList = dataBill.map((item) => {
-            return { medicineId: item.id, qty: item.qty}
+            return { medicine_id: item.id, qty: item.qty}
         });
         
         formData['items'] = itemList;
+        formData['from_store'] = formData.fromStore;
+        formData['to_store'] = formData.toStore;
+        formData['requested_by'] = formData.requestBy;
+        formData['approved_by'] = formData.approvedBy;
+        formData['status'] = 'NEW';
+        
         submitForm(formData, event)
     }
 
@@ -295,8 +302,8 @@ const StockRetrieval = () => {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true,
             });
-            if (response.data.status === true) {
-                swal("Success", "Purchase Generated Successfully !", "success");
+            if (response.data && response.data.id && Number(response.data.id) >0 ) {
+                swal("Success", "Medicines Transfered Successfully !", "success");
                 setValidated(false)
                 resetPage()
 

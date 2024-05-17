@@ -19,7 +19,8 @@ import {
     CModalTitle,
     CModalBody,
     CAlert,
-    CFormTextarea
+    CFormTextarea,
+    CCardTitle
 } from '@coreui/react'
 import DataTable from "react-data-table-component";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -31,20 +32,22 @@ import {
     cilTrash,
     cilPencil,
     cilPlus,
-    cilSearch
+    cilSearch,
+    cilCloudDownload
 } from '@coreui/icons'
 import Select from 'react-select'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import ExpandComponentItem from './ExpandComponentItem';
-// import ExpandComponentGrn from './ExpandComponentGrn';
 
-const supplierUrl = '/supplier'
+
+const requestUrl = '/get-pending-requests'
+const requestByIdUrl = '/stock-requisition'
 const itemsUrl = '/medicine'
-const stockReceiveURL = '/stock/stock-receive'
+const stockUrl = '/stock'
 const storeUrl = '/store'
+const transferUrl = '/stock-transfer'
 
-const StockRetrieval = () => {
+const StockTransfer = () => {
 
     const navigate = useNavigate()
     const inputRef = useRef(null);
@@ -60,6 +63,8 @@ const StockRetrieval = () => {
     const axiosPrivate = useAxiosPrivate();
     const [validated, setValidated] = React.useState(false)
     const [data, setData] = useState([]);
+    const [orderRequestList, setOrderRequestList] = useState([]);
+
     const [dataBill, setdataBill] = useState([]);
     const [totalRows, setTotalRows] = useState(0);
     const [perPage, setPerPage] = useState(5);
@@ -71,21 +76,50 @@ const StockRetrieval = () => {
     const [searchText, setSearch] = React.useState('')
     const [today] = useState(new Date());
     const [Lotvisible, setLotVisible] = React.useState(false)
+    const [requestVisible, setRequestVisible] = React.useState(false)
     const [isLot, setIsLot] = React.useState(false)
+    const [currentLot, setCurrentLot] = React.useState([{}])
     const [isExpire, setIsExpire] = React.useState(false)
     const [inputFields, setInputFields] = useState([])
     const [currentRow, setCurrentRow] = useState([])
     const [expandedRows, setExpandedRows] = useState([]);
+    const [requestedItemList,setRequestedItemList]=useState([]);
     const [qtyError, setQtyError] = React.useState(false)
-    const [expirePopupErrors,setExpirePopupErrors] = React.useState('')
+    const [lotsErrors, setLotsErrors] = React.useState('')
+    const [singleLot,setSingleLot]=React.useState(false)
 
 
-    const handleStoreChange = (selectedOption) => {
-        setFormData(prev => ({ ...prev, storeId: selectedOption.value }));
+    const [fromStores, setFromStores] = useState([]);
+    const [toStores, setToStores] = useState([]);
+
+
+    const handleFromStoreChange = (selectedOption) => {
+        localStorage.setItem('store', selectedOption.value);
+        setFormData(prev => ({ ...prev, fromStore: selectedOption.value }));
+        setToStores(stores.filter(a => a.value !== selectedOption.value));
     };
 
     const handleToStoreChange = (selectedOption) => {
-        setFormData(prev => ({ ...prev, toStoreId: selectedOption.value }));
+        setFormData(prev => ({ ...prev, toStore: selectedOption.value }));
+        setFromStores(stores.filter(a => a.value !== selectedOption.value));
+    };
+
+
+    const [issueTypes, setIssueTypes] = useState([
+        { label: 'Ward', value: '0' },
+        { label: 'OPT', value: '1' },
+    ]);
+
+    const handleIssueChange = (selectedOption) => {
+        setFormData(prev => ({ ...prev, issueType: selectedOption.value }));
+    }
+
+    const handleStoreChange = (selectedOption) => {
+        setFormData(prev => {
+            const updatedFormData = { ...prev, storeId: selectedOption.value };
+            localStorage.setItem('store', selectedOption.value);
+            return updatedFormData;
+        });
     };
 
     const setpurchaseDateValue = (date) => {
@@ -94,15 +128,14 @@ const StockRetrieval = () => {
 
     const [formData, setFormData] = useState({
         id: '',
-        storeId: '',
-        toStoreId: '',
-        date: new Date(),
-        source: '',
+        requestNo:'',
+        fromStore: '',
+        toStore: '',
         requestBy: '',
-        requisition:"",
         approvedBy: '',
+        date: new Date(),
         description: '',
-        medicineList: []
+        items: []
     });
 
     const clear = async () => {
@@ -118,14 +151,14 @@ const StockRetrieval = () => {
 
         setFormData({
             id: '',
-            storeId: '',
-            toStoreId: '',
-            date: new Date(),
-            source: '',
+            requestNo:'',
+            fromStore: '',
+            toStore: '',
             requestBy: '',
             approvedBy: '',
+            date: new Date(),
             description: '',
-            medicineList: []
+            items: []
         });
 
     }
@@ -159,7 +192,8 @@ const StockRetrieval = () => {
 
     const addItemToGrid = async () => {
         // debugger
-        let dataset = { id: Item, code: code, unit: Unit, name: ItemName, qty: Qty, lots: inputFields, isExpire: isExpire }
+        const addedLots = currentLot.filter(a => a.issueQty > 0);
+        let dataset = { id: Item, code: code, unit: Unit, name: ItemName, qty: Qty, lots: addedLots, isLot: isLot }
         let totData = [];
         if (editMode) {
             let filteredData = dataBill.filter(a => a.id !== Item);
@@ -190,39 +224,63 @@ const StockRetrieval = () => {
         setInputFields([])
     }
 
-    const setExpireDatesValues = async () => {
-        setQtyError(false)
-        let data = [...inputFields];
-        let qtySum = data.map(o => Number(o.expireQty)).reduce((a, c) => { return a + c });
-        const hasEmptyExpireDates = data.some(o => o.expireDate === '' || o.expireQty === '');
-        console.log('sum value', qtySum);
-
-
-
-        if (qtySum != Qty) {
-            setExpirePopupErrors('Qty and Expire Dates are not Equal')
-            setQtyError(true)
-        } else if (hasEmptyExpireDates) {
-            setExpirePopupErrors('Please Enter Expire Dates')
-            setQtyError(true)
-        }else{
-            addItemToGrid()
+    const calculateTotalQty = async () => {
+        let qtySum = currentLot.map(o => Number(o.issueQty)).reduce((a, c) => { return a + c });
+        if (qtySum > 0) {
+            setQty(qtySum)
         }
+    }
+    const setIssueMedicineQty = async () => {
+        setQtyError(false)
+        if(currentLot.length===0){
+            setLotsErrors('no Lots Available for this Medicine')
+            setQtyError(true)
+            return false
+        }
+
+        let qtySum = currentLot.map(o => Number(o.issueQty)).reduce((a, c) => { return a + c });
+        if (qtySum === 0) {
+            setQtyError(true)
+            setLotsErrors('Please Enter Issue Qty')
+            return false
+        }  
+
+        const problematicLots = currentLot.filter(o => o.issueQty > o.quantity);
+        if (problematicLots.length > 0) {
+            setQtyError(true)
+            setLotsErrors('Issue Qty is Greater than Available Qty')
+            return false
+        }
+
+        
+
+        
+        setQty(qtySum)
+        addItemToGrid()
+         
     }
 
     const checkValidity = async () => {
-        if (!formData.storeId) {
-            return { status: false, message: 'Please Select Store' };
+        if (!formData.fromStore) {
+            return { status: false, message: 'Please Select From Store' };
+        }
+        if (!formData.toStore) {
+            return { status: false, message: 'Please Select To Store' };
+        }
+        if (!formData.requestBy) {
+            return { status: false, message: 'Please Enter Request By' };
+        }
+        if (!formData.approvedBy) {
+            return { status: false, message: 'Please Enter Approved By' };
         }
 
-        if (!formData.source) {
-            return { status: false, message: 'Please Enter Stock Retrieve Source' };
+        if (dataBill.length === 0) {
+            return { status: false, message: 'Please Add Medicine to List' };
         }
-
         return { status: true };
     }
 
-    const handleDeleteExpireField = async (index) => {
+    const handleSelectLot = async (index) => {
         let data = [...inputFields];
         data.splice(index, 1);
         setInputFields(data);
@@ -249,6 +307,16 @@ const StockRetrieval = () => {
         console.log(inputFields);
     }
 
+    const loadRequests = async () => {
+        setLoading(true)
+        const response = await axiosPrivate.get(
+            requestUrl 
+        );
+        
+        setOrderRequestList(response.data);
+        setRequestVisible(true)
+        setLoading(false)
+    }
     const handleSubmit = async (event) => {
         console.log(event);
         event.preventDefault()
@@ -260,7 +328,19 @@ const StockRetrieval = () => {
         }
         setValidated(true)
         setLoading(true);
-        formData['medicineList'] = dataBill;
+
+        const itemList = dataBill.map((item) => {
+            console.log(item)
+            return { medicine_id: item.id, qty: item.qty, isLot:item.isLot, lots: item.lots }
+        })
+
+        formData['items'] = itemList;
+        formData['from_store'] = formData.fromStore;
+        formData['to_store'] = formData.toStore;
+        formData['requested_by'] = formData.requestBy;
+        formData['approved_by'] = formData.approvedBy;
+        formData['description'] = formData.description;
+        formData['status'] = 'NEW';
         submitForm(formData, event)
     }
 
@@ -270,15 +350,37 @@ const StockRetrieval = () => {
         console.log('received expire list');
     }
 
+    const loadRequestNumber = async (id,requestedBy,from,to) => {
+        setFormData(prev => ({ ...prev, requestNo: id }));
+        setFormData(prev => ({ ...prev, requestBy: requestedBy }));
+ 
+        setFormData(prev => ({ ...prev, fromStore: from }));
+        setFormData(prev => ({ ...prev, toStore: to }));
+        const response = await axiosPrivate.get(
+            requestByIdUrl + `/${id}`
+        );
+        setRequestedItemList(response.data);
+        setRequestVisible(false)
+         
+    }
+
+    const getStoreNameById = (id) => {  
+        let store = stores.find(a => a.value === id);
+        return store ? store.label : '';
+    }
+    const handleCloseRequestModal = async () => {
+        setRequestVisible(false)
+    }
+
     const submitForm = async (data, event) => {
         try {
             let response = {};
-            response = await axiosPrivate.post(stockReceiveURL, JSON.stringify(data), {
+            response = await axiosPrivate.post(`${transferUrl}`, JSON.stringify(data), {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true,
             });
-            if (response.data.status === true) {
-                swal("Success", "Purchase Generated Successfully !", "success");
+            if (response.data && response.data.id && Number(response.data.id) >0 ) {
+                swal("Success", "Medicine Transfered Successfully !", "success");
                 setValidated(false)
                 resetPage()
 
@@ -314,6 +416,8 @@ const StockRetrieval = () => {
         });
 
         setStores(storesArray)
+        setFromStores(storesArray)
+        setToStores(storesArray)
         setLoading(false);
 
     }
@@ -321,12 +425,13 @@ const StockRetrieval = () => {
     useEffect(() => {
         fetchStore()
         fetchItems(1)
-    }, []);
+    }, [formData.storeId, currentPage, perPage, searchText]);
 
 
 
     const resetPage = async (items) => {
         setdataBill([])
+        setRequestedItemList([])
         fetchItems(1)
         clear()
         setSearch('')
@@ -379,9 +484,7 @@ const StockRetrieval = () => {
             setUnit(row.unit)
             setIsExpire(row.isExpire)
             setIsLot(row.isLot)
-            if (row.Lot) {
-                setInputFields(row.Lot)
-            }
+
 
             const element = document.getElementById('ItemName');
             if (element) {
@@ -391,16 +494,67 @@ const StockRetrieval = () => {
                 inputRef.current.select();
             }
             if (row.lots.length > 0) {
-                setInputFields(row.lots)
+                debugger
+                let Clots = await getAvailableLots(row.id);
+                console.log('ddddddd')
+                console.log(Clots)
+                if (Clots.length > 0) {
+                    Clots.forEach(element => {
+                        row.lots.forEach(rl => {
+                            if (rl.lotId === element.lotId) {
+                                element.issueQty = rl.issueQty
+                            }
+                        })
+                        // element.issueQty = 0
+                    });
+                    setCurrentLot(Clots)
+                    setLotVisible(true)
+                }
             }
-
         },
         [currentPage, perPage, totalRows]
     );
 
 
+    const getAvailableLots = async (id) => {
+        setCurrentLot([])
+        setIsLot(false)
+        setLoading(true)
+        const selectedStore = localStorage.getItem('store');
+        if (!selectedStore) {
+            swal("Problem", "Please Select Store First", "warning");
+            return false
+        }
+
+        const url = `${stockUrl}/lots-available`
+
+
+        let response = {};
+        response = await axiosPrivate.get(url, {
+            headers: { 'Content-Type': 'application/json', storeId: selectedStore, itemId: id },
+            withCredentials: true,
+        });
+
+        debugger
+        if (response.data.status === true) {
+            const { data } = response.data;
+            if (data.length > 0) {
+                setIsLot(true)
+                setQty(0)
+                setCurrentLot(data);
+            }
+        }
+        setLoading(false)
+        return response.data;
+    }
+
     const handleEdit = useCallback(
         row => async () => {
+            setSingleLot(false)
+            const data = await getAvailableLots(row.id);
+            setCurrentLot(data)
+            console.log('this is received data')
+            console.log(data)
             setItem(row.id)
             setItemName(row.name)
             setCode(row.code)
@@ -411,6 +565,12 @@ const StockRetrieval = () => {
             element.focus()
             setEsearchMode(false);
             console.log('is Lot', isLot);
+             
+            if (data && data.length > 0) {
+                setLotVisible(true)
+                setIsLot(true)
+                setQty(0)
+            }
         },
         [dataBill]
     );
@@ -510,53 +670,158 @@ const StockRetrieval = () => {
     };
     // const ExpandedComponent = (datas) => <pre> {JSON.stringify(datas, null, 2)}</pre>
 
+    const handleIssueQtyChange = async (index, e) => {
+        const updatedLots = [...currentLot];
+        updatedLots[index].issueQty = e.target.value;
+        setCurrentLot(updatedLots);
+        let qtySum = currentLot.map(o => Number(o.issueQty ?? 0)).reduce((a, c) => { return a + c });
+        console.log('calculating sum of qty', qtySum)
+        if (qtySum > 0) {
+            setQty(qtySum)
+        }
+    }
 
+    const ExpandComponentItem = (datas) =>
+        <div>
+            <CCard>
+                <CCardHeader>
+                    <CCardTitle>
+                        <span>Lot Information   </span>   -    {datas.data.name}
+                    </CCardTitle>
+                </CCardHeader>
+                <CCardBody>
+                    {/* <pre>{JSON.stringify(datas.data, null, 2)}</pre> */}
+                    <table className='table   table-responsive  table-hover'>
+                        <thead>
+                            <tr>
+                                <th><CFormLabel htmlFor="lotNumber">Lot Number</CFormLabel></th>
+                                <th><CFormLabel htmlFor="issue">Issue Qty</CFormLabel></th>
+                                <th><CFormLabel htmlFor="expireDate">Expire Date</CFormLabel></th>
+                                <th><CFormLabel htmlFor="receivedDate">Received Date</CFormLabel></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {datas.data.lots?.map((lot, index) => {
+                                return (
+
+                                    <tr key={index}>
+
+                                        <td>
+                                            {lot.lotNum}
+                                        </td>
+                                        <td>
+                                            {lot.issueQty}
+                                        </td>
+
+                                        <td>
+                                            {lot.expiryDate}
+                                        </td>
+                                        <td>
+                                            {lot.purchaseDate}
+                                        </td>
+
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+
+
+                </CCardBody>
+            </CCard>
+
+        </div >
 
     return (
         <CRow>
             <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
-                        <strong>Stock Transfer</strong>
+                        <strong>Medicine Transfer</strong>
                     </CCardHeader>
                     <CCardBody>
-                    <p></p>
                         <CForm className="row g-3 needs-validation" validated={validated} onSubmit={handleSubmit}>
                             {/* <pre>{JSON.stringify(dataBill, null, 2)}  </pre> */}
                             <CRow>
-                                <CCol md={5}>
-                                    <CFormLabel htmlFor="requisition">Requisition Number</CFormLabel>
-                                    <CFormInput type="text" id="requisition" name="requisition" required value={formData.requisition} onChange={handleChange} />
+                                <CCol md={4}>
+                                    <CFormLabel htmlFor="requestNo">Request No</CFormLabel>
+                                    <CFormInput type="text" id="requestNo" name="requestNo" readOnly required value={formData.requestNo} onChange={handleChange} />
+                                   
+                                </CCol>
+                                <CCol md={1}>
+                                    <CFormLabel htmlFor="requestNo">Search</CFormLabel>
+                                    <CButton className='inline'onClick={(e) => loadRequests()}  ><CIcon icon={cilSearch}></CIcon></CButton>
                                 </CCol>
                             </CRow>
                             <CRow>
                                 <CCol md={5}>
                                     <CFormInput type="hidden" id="user" name='user' value={user} />
                                     <CFormLabel htmlFor="Store">From Store</CFormLabel>
-                                    <Select options={stores} onChange={handleStoreChange} name='storeId' id='storeId' required={true} value={stores.find(a => a.value === formData.storeId) ?? ''} />
+                                    <Select options={fromStores} onChange={handleFromStoreChange} name='fromStore' id='fromStore' required={true} value={stores.find(a => a.value === formData.fromStore) ?? ''} />
                                 </CCol>
-                                <CCol md={5}>
-                                    <CFormLabel htmlFor="Source">To Store</CFormLabel>
-                                    <Select options={stores} onChange={handleToStoreChange} name='toStoreId' id='toStoreId' required={true} value={stores.find(a => a.value === formData.toStoreId) ?? ''} />
+                                <CCol md={5} >
+                                    <CFormLabel htmlFor="toStore">To Store</CFormLabel>
+                                    <Select options={toStores} onChange={handleToStoreChange} name='toStore' id='toStore' required={true} value={stores.find(a => a.value === formData.toStore) ?? ''} />
                                 </CCol>
+
+
                                 <CCol md={2}>
                                     <CFormLabel htmlFor="Name">Date</CFormLabel>
                                     <DatePicker maxDate={today} name='date' style={{ textAlign: 'right' }} className='form-control text-right' selected={formData.date} onChange={(date) => setpurchaseDateValue(date)} required={true} />
                                 </CCol>
+
+
                             </CRow>
                             <CRow>
-                                <CCol md={5}>
+                                
+                                <CCol md={6}>
                                     <CFormLabel htmlFor="requestBy">Request By</CFormLabel>
                                     <CFormInput type="text" id="requestBy" name="requestBy" required value={formData.requestBy} onChange={handleChange} />
                                 </CCol>
-                                <CCol md={5}>
+                                <CCol md={6}>
                                     <CFormLabel htmlFor="approved_by">Approved By</CFormLabel>
                                     <CFormInput type="text" id="approvedBy" name="approvedBy" required value={formData.approvedBy} onChange={handleChange} />
                                 </CCol>
                             </CRow>
 
                             <CCard className="mb-5">
-                                <CCardHeader>Medicine for Retrieve</CCardHeader>
+                                <CCardHeader className='info'>Requested Medicine Details</CCardHeader>
+                                <CCardBody> 
+                                <table className='table   table-responsive  table-hover'>
+                        <thead>
+                            <tr>
+                                <th><CFormLabel htmlFor="lotNumber">Medicine</CFormLabel></th>
+                                <th><CFormLabel htmlFor="issue">Ask Qty</CFormLabel></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {requestedItemList?.items?.map((item, index) => {
+                                return (
+
+                                    <tr key={index}>
+
+                                        <td>
+                                            {item.name}
+                                        </td>
+                                        <td>
+                                            {item.qty}
+                                        </td>
+
+                                       
+
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+
+                                </CCardBody>
+                            </CCard>
+                            
+
+
+                            <CCard className="mb-5">
+                                <CCardHeader>Select Medicine For Transfer</CCardHeader>
                                 <CCardBody>
                                     <CRow>
                                         <CCol xs={6} ></CCol>
@@ -587,8 +852,7 @@ const StockRetrieval = () => {
                                             paginationDefaultPage={currentPage}
                                             onChangeRowsPerPage={handlePerRowsChange}
                                             onChangePage={handlePageChange}
-                                        // expandableRows
-                                        // expandableRowsComponent={ExpandComponentItem}
+
 
                                         />)}
                                 </CCardBody>
@@ -628,9 +892,9 @@ const StockRetrieval = () => {
                                     expandableRowExpanded={(row) => (row === currentRow)}
                                     expandOnRowClicked
                                     onRowClicked={(row) => setCurrentRow(row)}
-                                // expandableRows
-                                // expandableRowsComponent={ExpandComponentGrn}
-                                // onRowExpandToggled={(bool, row) => setCurrentRow(row)}
+                                    expandableRows
+                                    expandableRowsComponent={ExpandComponentItem}
+                                    onRowExpandToggled={(bool, row) => setCurrentRow(row)}
 
                                 />
                             </CRow>
@@ -644,12 +908,13 @@ const StockRetrieval = () => {
 
                             <p></p>
                             <CRow>
+                                <CCol xs={7} ></CCol>
                                 <CCol xs={3} >
                                     {loading ? (
                                         <CSpinner color="primary" variant="grow" />
                                     ) : (
                                         <CButton color="primary form-control" type="submit" name='BtnSave' >
-                                            Submit Stock Transfer
+                                            Transfer Medicines
                                         </CButton>
 
                                     )}
@@ -673,36 +938,51 @@ const StockRetrieval = () => {
                                 <CModalHeader>
                                     <CModalTitle>
                                         <CCardHeader>
-                                            <strong>Expire Dates  For</strong> <small>{ItemName}</small>
+                                            <strong>Available Lots For</strong> <small>{ItemName}</small>
                                         </CCardHeader>
                                     </CModalTitle>
 
 
                                 </CModalHeader>
                                 <CModalBody>
-                                    <table className='table'>
+                                    {/* <pre>{JSON.stringify(currentLot, null, 2)}</pre> */}
+                                    {/* {Qty} */}
+                                    <table className='table   table-responsive  table-hover'>
                                         <thead>
                                             <tr>
-                                                <th><CFormLabel htmlFor="expireQty">Qty</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="expireQty">Available</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="issue">Issue Qty</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="lotNumber">Lot Number</CFormLabel></th>
                                                 <th><CFormLabel htmlFor="expireDate">Expire Date</CFormLabel></th>
-                                                <th><CButton type='button' className='btn btn-success  bg-green' onClick={() => handleAddNewExpireField()}><CIcon icon={cilPlus} /></CButton></th>
+                                                <th><CFormLabel htmlFor="receivedDate">Received Date</CFormLabel></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {inputFields.map((input, index) => {
+                                            {/* <pre>{JSON.stringify(currentLot, null, 2)}</pre> */}
+
+                                            {currentLot.map((lot, index) => {
                                                 return (
+
                                                     <tr key={index}>
+                                                        {/* <pre>{JSON.stringify(lot, null, 2)}</pre> */}
                                                         <td>
-                                                            <CFormInput type="number" name="expireQty" value={inputFields[index].expireQty} onChange={event => handleFormChange(index, event, 'expireQty')} />
+                                                            <button type="button" class="btn btn-success">
+                                                                <span class="badge badge-light">{lot.quantity}</span>
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            <CFormInput type="number" id="issueQty" value={lot.issueQty} onChange={event => handleIssueQtyChange(index, event)} />
+                                                        </td>
+                                                        <td>
+                                                            {lot.lotNum}
+                                                        </td>
+                                                        <td>
+                                                            {lot.expiryDate}
+                                                        </td>
+                                                        <td>
+                                                            {lot.purchaseDate}
                                                         </td>
 
-                                                        <td>
-                                                            <DatePicker minTime={today} style={{ textAlign: 'right' }} value={inputFields[index].expireDate} name="expireDate" dateFormat='yyyy-MM-dd' className='form-control text-right' onChange={(event) => handleFormChange(index, event, 'expireDate')} required={true} />
-
-                                                        </td>
-                                                        <td>
-                                                            <CButton type='button' className='btn btn-danger small' onClick={() => handleDeleteExpireField(index)}><CIcon icon={cilTrash} /></CButton>
-                                                        </td>
                                                     </tr>
                                                 )
                                             })}
@@ -710,33 +990,108 @@ const StockRetrieval = () => {
                                     </table>
 
                                     <p>
+                                        <CRow>
+                                            <CCol lg={6}>
+                                                {qtyError ?
+                                                    (
+                                                        <CAlert color="danger">
+                                                            {lotsErrors}
+                                                        </CAlert>
+                                                    ) : (<p></p>)
+                                                }
+
+                                            </CCol>
+                                            <CCol lg={4}> <CAlert className='info'>Issuing Qty : <strong>{Qty}</strong>   </CAlert></CCol>
+                                            <CCol lg={2}>
+
+                                                <CButton color="btn btn-primary form-control" type="button" onClick={() => setIssueMedicineQty()} >
+                                                    Done
+                                                </CButton>
+                                            </CCol>
+                                        </CRow>
+
 
                                     </p>
-                                    <CRow>
-                                        <CCol lg={10}>
-                                            {qtyError ?
-                                                (
-                                                    <CAlert color="danger">
-                                                        {expirePopupErrors}
-                                                    </CAlert>
-                                                ) : (<p></p>)
-                                            }
-
-                                        </CCol>
-                                        <CCol lg={2}>
-                                            <CButton color="btn btn-success form-control" type="button" onClick={() => setExpireDatesValues()} >
-                                                Done
-                                            </CButton>
-                                        </CCol>
-                                    </CRow>
-
-
-
-
+                                    {/* <pre>{JSON.stringify(currentLot, null, 2)}</pre> */}
                                 </CModalBody>
 
                             </CModal>
                         </CRow >
+
+
+  {/* Model For Search Request */}
+                        <CRow>
+                            <CModal size="xl" visible={requestVisible} onClose={handleCloseRequestModal}   >
+                                <CModalHeader>
+                                    <CModalTitle>
+                                        <CCardHeader>
+                                            <strong>Pending Medicine Requests</strong> <small>{ItemName}</small>
+                                        </CCardHeader>
+                                    </CModalTitle>
+
+
+                                </CModalHeader>
+                                <CModalBody>
+                                     
+                                    <table className='table   table-responsive  table-hover'>
+                                        <thead>
+                                            <tr>
+                                                <th><CFormLabel htmlFor="issue">No</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="Reference">Reference</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="expireQty">Requested Date</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="issue">Requested By</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="lotNumber">From Store</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="expireDate">To Store</CFormLabel></th>
+                                                <th><CFormLabel htmlFor="action">Action</CFormLabel></th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+
+                                            {orderRequestList?.map((lot, index) => {
+                                                return (
+
+                                                    <tr key={index}>
+                                                       
+                                                        <td>
+                                                            {lot.id}
+                                                        </td>
+                                                        <td>
+                                                            {lot.reference}
+                                                        </td>
+                                                        <td>
+                                                            {lot.createdDate}
+                                                        </td>
+                                                        <td>
+                                                            {lot.requestedBy}
+                                                        </td>
+                                                        <td>
+                                                            {getStoreNameById(lot.fromStoreId)}
+                                                        </td>
+                                                        <td>
+                                                        {getStoreNameById(lot.toStoreId)}
+                                                        </td>
+                                                        <td>
+                                                        <CButton color="btn btn-info form-control" title='Load Request' type="button" onClick={() => loadRequestNumber(lot.id,lot.requestedBy,lot.toStoreId,lot.fromStoreId)} >
+                                                            <CIcon icon={cilCloudDownload} />
+                                                        </CButton>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                            
+                                        </tbody>
+                                    </table>
+
+                                    
+                                </CModalBody>
+
+                            </CModal>
+                        </CRow >
+
+
+                        
                     </CCardBody>
 
                 </CCard>
@@ -746,4 +1101,4 @@ const StockRetrieval = () => {
     )
 }
 
-export default StockRetrieval
+export default StockTransfer
