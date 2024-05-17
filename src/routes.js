@@ -10,6 +10,7 @@ const StockRetrieval = React.lazy(() => import('./views/stock-retrieval/StockRet
 const StockTransfer = React.lazy(() => import('./views/stock-transfer/StockTransfer'))
 const AssignMedicines = React.lazy(() => import('./views/medicine-assign/MedicineAssign'))
 const StockInquiry = React.lazy(() => import('./views/stock-inquiry/StockInquiry'))
+const StockRequest = React.lazy(() => import('./views/stock-request/StockRequest'))
 
 const routes = [
     { path: '/', exact: true, name: 'Home' , element:Home},
@@ -22,6 +23,7 @@ const routes = [
     { path: '/stock-transfer', name: 'StockTransfer', element: StockTransfer },
     { path: '/medicine-Issuing', name: 'AssignMedicines', element: AssignMedicines },
     { path: '/stock-inquiries', name: 'StockInquiry', element: StockInquiry },
+    { path: '/stock-request', name: 'StockRequest', element: StockRequest },
 ]
 
 export default routes

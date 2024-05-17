@@ -281,6 +281,13 @@ const StockInquiry = () => {
                                 conditionalRowStyles={customStyles}
                             />
                         </CRow>
+
+                        <CRow>
+                            <CCol xs={2}>
+                                <li className='legend'>d</li>
+                            </CCol>
+                        </CRow>
+
                     </CCardBody>
                 </CCard>
             </CCol>
