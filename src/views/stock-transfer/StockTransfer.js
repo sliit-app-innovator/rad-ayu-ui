@@ -359,6 +359,7 @@ const StockTransfer = () => {
         const response = await axiosPrivate.get(
             requestByIdUrl + `/${id}`
         );
+        localStorage.setItem('store', from);
         setRequestedItemList(response.data);
         setRequestVisible(false)
          
