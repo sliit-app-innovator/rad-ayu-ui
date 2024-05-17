@@ -79,13 +79,13 @@ const fetcInitialData = async (id) => {
         setMedicineMovement(dashboardData.data.medicineMovement);
         setFastExpiringItems(dashboardData.data.top5ExpiringMedicines)
 
-        
+        const comRate = dashboardData.data.stockRequsitions.completedRate;
         setRequisitions(dashboardData.data.stockRequsitions.pending);
-        setRequisitionCR(dashboardData.data.stockRequsitions.completedRate);
+        setRequisitionCR(Number(comRate).toFixed(2));
 
         const pendingReorder = dashboardData.data.reorderLevels.pending;
         const total = dashboardData.data.reorderLevels.total;
-        const rate = (pendingReorder/total)*100;
+        const rate = Number((pendingReorder/total)*100).toFixed(2);
 
         setReOrderRate(rate);
         setPendingReorder(pendingReorder);
